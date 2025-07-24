@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/wingedearth/users-service/compare/v1.2.0...v1.2.1) (2025-07-24)
+
+
+### Documentation
+
+* update README with comprehensive JWT authentication documentation ([3f36980](https://github.com/wingedearth/users-service/commit/3f369800e4d98e7f59103f1e3122865aba498a1b))
+
 ## [1.2.0](https://github.com/wingedearth/users-service/compare/v1.1.1...v1.2.0) (2025-07-24)
 
 
