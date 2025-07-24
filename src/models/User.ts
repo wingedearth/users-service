@@ -1,12 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 // Interface for the User document
 export interface IUser extends Document {
   email: string;
   firstName: string;
   lastName: string;
+  password: string;
   createdAt: Date;
   updatedAt: Date;
+  comparePassword(candidatePassword: string): Promise<boolean>;
+  toAuthJSON(): object;
 }
 
 // User schema definition
@@ -34,6 +38,12 @@ const UserSchema: Schema = new Schema(
       required: [true, 'Last name is required'],
       trim: true,
       maxlength: [50, 'Last name cannot be more than 50 characters']
+    },
+    password: {
+      type: String,
+      required: false, // Made optional for admin user creation
+      minlength: [6, 'Password must be at least 6 characters long'],
+      select: false // Exclude password field by default
     }
   },
   {
@@ -48,8 +58,28 @@ const UserSchema: Schema = new Schema(
     }
   }
 );
+// Hash password before saving
+UserSchema.pre('save', async function(next) {
+  if (!this.isModified('password') || !this.password) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password as string, salt);
+  next();
+});
 
-// Index for faster email lookups
+// Compare password method
+UserSchema.methods.comparePassword = async function(candidatePassword: string): Promise<boolean> {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+
+// Create JSON response with auth token
+UserSchema.methods.toAuthJSON = function() {
+  return {
+    id: this._id,
+    email: this.email,
+    firstName: this.firstName,
+    lastName: this.lastName
+  };
+};
 UserSchema.index({ email: 1 });
 
 // Export the model

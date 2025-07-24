@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { User, CreateUserRequest, UpdateUserRequest, ApiResponse } from '../types/user';
 import UserModel, { IUser } from '../models/User';
 import mongoose from 'mongoose';
+import { requireAuth } from '../middleware/auth';
 
 const router = express.Router();
 
@@ -121,8 +122,8 @@ router.post('/', async (req: Request<{}, ApiResponse<User>, CreateUserRequest>, 
   }
 });
 
-// PUT /api/users/:id - Update user
-router.put('/:id', async (req: Request<{ id: string }, ApiResponse<User>, UpdateUserRequest>, res: Response<ApiResponse<User>>) => {
+// PUT /api/users/:id - Update user (protected)
+router.put('/:id', requireAuth, async (req: Request<{ id: string }, ApiResponse<User>, UpdateUserRequest>, res: Response<ApiResponse<User>>) => {
   try {
     const { id } = req.params;
     const { email, firstName, lastName } = req.body;
@@ -201,8 +202,8 @@ router.put('/:id', async (req: Request<{ id: string }, ApiResponse<User>, Update
   }
 });
 
-// DELETE /api/users/:id - Delete user
-router.delete('/:id', async (req: Request, res: Response<ApiResponse<User>>) => {
+// DELETE /api/users/:id - Delete user (protected)
+router.delete('/:id', requireAuth, async (req: Request, res: Response<ApiResponse<User>>) => {
   try {
     const { id } = req.params;
     
