@@ -242,6 +242,11 @@ Common HTTP status codes:
 - `npm test` - Run tests (not implemented yet)
 - `npm run test:api` - Run API endpoint tests with curl
 
+**Releases & Commits:**
+- `npm run commit` - Interactive commit with conventional commit format
+- `npm run release` - Generate new release with automated changelog
+- `npm run release:dry-run` - Preview what would be released
+
 ### Project Structure
 
 ```
@@ -268,6 +273,15 @@ src/
 7. **Search & Filtering** - Add user search and filtering capabilities
 8. **Docker** - Add Docker support for the application itself
 9. **CI/CD** - Set up GitHub Actions for automated testing and deployment
+
+## Contributing
+
+This project follows conventional commit standards and uses automated changelog generation. See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+
+- Commit message format
+- Development workflow  
+- Release process
+- Code standards
 
 ## License
 

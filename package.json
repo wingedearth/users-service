@@ -13,7 +13,14 @@
     "db:logs": "docker-compose logs -f mongodb",
     "db:admin": "docker-compose up -d mongo-express",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:api": "./test-api.sh"
+    "test:api": "./test-api.sh",
+    "release": "standard-version",
+    "release:minor": "standard-version --release-as minor",
+    "release:major": "standard-version --release-as major",
+    "release:patch": "standard-version --release-as patch",
+    "release:dry-run": "standard-version --dry-run",
+    "commit": "git-cz",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -39,13 +46,25 @@
     "morgan": "^1.10.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@types/cors": "^2.8.19",
     "@types/helmet": "^0.0.48",
     "@types/mongodb": "^4.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.1.0",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
     "nodemon": "^3.1.10",
+    "standard-version": "^9.5.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
