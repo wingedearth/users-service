@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/wingedearth/users-service/compare/v1.1.0...v1.1.1) (2025-07-24)
+
+
+### Documentation
+
+* add project summary and fix husky deprecation warning ([6544bfe](https://github.com/wingedearth/users-service/commit/6544bfebc581b7728dd003d94fcf68601c830ef9))
+
 ## 1.1.0 (2025-07-24)
 
 
