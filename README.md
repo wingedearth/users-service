@@ -8,6 +8,8 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 - ✅ TypeScript for type safety
 - ✅ Express.js web framework
 - ✅ MongoDB database with Mongoose ODM
+- ✅ JWT-based authentication and authorization
+- ✅ Secure password hashing with bcrypt
 - ✅ Input validation and data modeling
 - ✅ Comprehensive error handling
 - ✅ Health check endpoint
@@ -54,6 +56,7 @@ NODE_ENV=development
 PORT=3000
 MONGODB_URI=mongodb://app-user:app-password@localhost:27017/users-service
 DB_NAME=users-service
+JWT_SECRET=your-super-secret-jwt-key-here
 ```
 
 ## API Documentation
@@ -79,7 +82,98 @@ Returns service health status.
 }
 ```
 
+### Authentication API
+
+#### Register User
+```
+POST /api/auth/register
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "securePassword123",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "507f1f77bcf86cd799439011",
+      "email": "john.doe@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "createdAt": "2024-07-24T03:30:00.000Z",
+      "updatedAt": "2024-07-24T03:30:00.000Z"
+    }
+  }
+}
+```
+
+#### Login User
+```
+POST /api/auth/login
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "securePassword123"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "507f1f77bcf86cd799439011",
+      "email": "john.doe@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "createdAt": "2024-07-24T03:30:00.000Z",
+      "updatedAt": "2024-07-24T03:30:00.000Z"
+    }
+  }
+}
+```
+
+#### Get Current User (Protected)
+```
+GET /api/auth/me
+Authorization: Bearer <token>
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "507f1f77bcf86cd799439011",
+    "email": "john.doe@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "createdAt": "2024-07-24T03:30:00.000Z",
+    "updatedAt": "2024-07-24T03:30:00.000Z"
+  }
+}
+```
+
 ### Users API
+
+*Note: All user endpoints require authentication. Include the JWT token in the Authorization header: `Authorization: Bearer <token>`*
 
 #### Get All Users
 ```
@@ -218,6 +312,7 @@ All endpoints return errors in the following format:
 
 Common HTTP status codes:
 - `400` - Bad Request (validation errors)
+- `401` - Unauthorized (invalid or missing token)
 - `404` - Not Found (user doesn't exist)
 - `409` - Conflict (email already exists)
 - `500` - Internal Server Error
@@ -241,6 +336,7 @@ Common HTTP status codes:
 **Testing:**
 - `npm test` - Run tests (not implemented yet)
 - `npm run test:api` - Run API endpoint tests with curl
+- `npm run test:auth` - Run authentication endpoint tests
 
 **Releases & Commits:**
 - `npm run commit` - Interactive commit with conventional commit format
@@ -251,28 +347,32 @@ Common HTTP status codes:
 
 ```
 src/
-├── server.ts          # Main server file
+├── server.ts              # Main server file
 ├── config/
-│   └── database.ts    # MongoDB connection configuration
+│   └── database.ts        # MongoDB connection configuration
 ├── models/
-│   └── User.ts        # Mongoose User model
+│   └── User.ts            # Mongoose User model with auth methods
 ├── routes/
-│   └── users.ts       # User API routes
+│   ├── users.ts           # User API routes (protected)
+│   └── auth.ts            # Authentication routes
+├── middleware/
+│   └── auth.ts            # JWT authentication middleware
+├── utils/
+│   └── jwt.ts             # JWT token utilities
 └── types/
-    └── user.ts        # TypeScript type definitions
+    └── user.ts            # TypeScript type definitions
 ```
 
 ## Next Steps
 
-1. **Authentication** - Add JWT-based authentication
-2. **Enhanced Validation** - Add request validation with libraries like Joi or Zod
-3. **Testing** - Add unit and integration tests
-4. **Logging** - Enhanced logging with Winston or similar
-5. **Rate Limiting** - Add API rate limiting
-6. **Pagination** - Add pagination for user lists
-7. **Search & Filtering** - Add user search and filtering capabilities
-8. **Docker** - Add Docker support for the application itself
-9. **CI/CD** - Set up GitHub Actions for automated testing and deployment
+1. **Enhanced Validation** - Add request validation with libraries like Joi or Zod
+2. **Testing** - Add unit and integration tests
+3. **Logging** - Enhanced logging with Winston or similar
+4. **Rate Limiting** - Add API rate limiting
+5. **Pagination** - Add pagination for user lists
+6. **Search & Filtering** - Add user search and filtering capabilities
+7. **Docker** - Add Docker support for the application itself
+8. **CI/CD** - Set up GitHub Actions for automated testing and deployment
 
 ## Contributing
 
