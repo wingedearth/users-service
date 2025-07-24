@@ -7,18 +7,22 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 - ✅ Full CRUD operations for users
 - ✅ TypeScript for type safety
 - ✅ Express.js web framework
-- ✅ Input validation
-- ✅ Error handling
+- ✅ MongoDB database with Mongoose ODM
+- ✅ Input validation and data modeling
+- ✅ Comprehensive error handling
 - ✅ Health check endpoint
 - ✅ CORS enabled
 - ✅ Security headers with Helmet
 - ✅ Request logging with Morgan
+- ✅ Docker Compose for development
+- ✅ MongoDB Express admin interface
 
 ## Quick Start
 
 ### Prerequisites
 - Node.js (v16 or higher)
 - npm
+- Docker and Docker Compose
 
 ### Installation
 
@@ -29,6 +33,9 @@ cd users-service
 
 # Install dependencies
 npm install
+
+# Start MongoDB database
+npm run db:up
 
 # Run in development mode
 npm run dev
@@ -45,6 +52,8 @@ Create a `.env` file in the root directory:
 ```
 NODE_ENV=development
 PORT=3000
+MONGODB_URI=mongodb://app-user:app-password@localhost:27017/users-service
+DB_NAME=users-service
 ```
 
 ## API Documentation
@@ -217,31 +226,48 @@ Common HTTP status codes:
 
 ### Available Scripts
 
+**Development:**
 - `npm run dev` - Run in development mode with ts-node
 - `npm run dev:watch` - Run in development mode with auto-restart
 - `npm run build` - Build TypeScript to JavaScript
 - `npm start` - Run the compiled JavaScript
+
+**Database:**
+- `npm run db:up` - Start MongoDB with Docker Compose
+- `npm run db:down` - Stop and remove MongoDB containers
+- `npm run db:logs` - View MongoDB logs
+- `npm run db:admin` - Start MongoDB Express web interface (http://localhost:8081)
+
+**Testing:**
 - `npm test` - Run tests (not implemented yet)
+- `npm run test:api` - Run API endpoint tests with curl
 
 ### Project Structure
 
 ```
 src/
 ├── server.ts          # Main server file
+├── config/
+│   └── database.ts    # MongoDB connection configuration
+├── models/
+│   └── User.ts        # Mongoose User model
 ├── routes/
-│   └── users.ts       # User routes
+│   └── users.ts       # User API routes
 └── types/
     └── user.ts        # TypeScript type definitions
 ```
 
 ## Next Steps
 
-1. **Database Integration** - Replace in-memory storage with a real database (PostgreSQL, MongoDB, etc.)
-2. **Authentication** - Add JWT-based authentication
-3. **Validation** - Add proper request validation with libraries like Joi or Zod
-4. **Testing** - Add unit and integration tests
-5. **Docker** - Add Docker support for containerization
-6. **CI/CD** - Set up GitHub Actions for automated testing and deployment
+1. **Authentication** - Add JWT-based authentication
+2. **Enhanced Validation** - Add request validation with libraries like Joi or Zod
+3. **Testing** - Add unit and integration tests
+4. **Logging** - Enhanced logging with Winston or similar
+5. **Rate Limiting** - Add API rate limiting
+6. **Pagination** - Add pagination for user lists
+7. **Search & Filtering** - Add user search and filtering capabilities
+8. **Docker** - Add Docker support for the application itself
+9. **CI/CD** - Set up GitHub Actions for automated testing and deployment
 
 ## License
 

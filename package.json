@@ -8,7 +8,12 @@
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
     "dev:watch": "nodemon --exec ts-node src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "db:up": "docker-compose up -d mongodb",
+    "db:down": "docker-compose down",
+    "db:logs": "docker-compose logs -f mongodb",
+    "db:admin": "docker-compose up -d mongo-express",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test:api": "./test-api.sh"
   },
   "repository": {
     "type": "git",
@@ -29,11 +34,14 @@
     "dotenv": "^17.2.0",
     "express": "^4.21.2",
     "helmet": "^8.1.0",
+    "mongodb": "^6.18.0",
+    "mongoose": "^8.16.4",
     "morgan": "^1.10.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/helmet": "^0.0.48",
+    "@types/mongodb": "^4.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.1.0",
     "nodemon": "^3.1.10",

@@ -1,159 +1,240 @@
 import express, { Request, Response } from 'express';
 import { User, CreateUserRequest, UpdateUserRequest, ApiResponse } from '../types/user';
+import UserModel, { IUser } from '../models/User';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
-// In-memory storage for now (replace with database later)
-let users: User[] = [
-  {
-    id: 1,
-    email: 'john.doe@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  {
-    id: 2,
-    email: 'jane.smith@example.com',
-    firstName: 'Jane',
-    lastName: 'Smith',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-];
-
-let nextId = 3;
-
 // GET /api/users - Get all users
-router.get('/', (req: Request, res: Response<ApiResponse<User[]>>) => {
-  res.json({
-    success: true,
-    data: users,
-    count: users.length
-  });
+router.get('/', async (req: Request, res: Response<ApiResponse<User[]>>) => {
+  try {
+    const users = await UserModel.find().sort({ createdAt: -1 });
+    
+    return res.json({
+      success: true,
+      data: users.map(user => user.toJSON() as User),
+      count: users.length
+    });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to fetch users'
+    });
+  }
 });
 
 // GET /api/users/:id - Get user by ID
-router.get('/:id', (req: Request, res: Response<ApiResponse<User>>) => {
-  const id = parseInt(req.params.id);
-  const user = users.find(u => u.id === id);
-  
-  if (!user) {
-    return res.status(404).json({
+router.get('/:id', async (req: Request, res: Response<ApiResponse<User>>) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid user ID format'
+      });
+    }
+    
+    const user = await UserModel.findById(id);
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    return res.json({
+      success: true,
+      data: user.toJSON() as User
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    return res.status(500).json({
       success: false,
-      error: 'User not found'
+      error: 'Failed to fetch user'
     });
   }
-  
-  return res.json({
-    success: true,
-    data: user
-  });
 });
 
 // POST /api/users - Create new user
-router.post('/', (req: Request<{}, ApiResponse<User>, CreateUserRequest>, res: Response<ApiResponse<User>>) => {
-  const { email, firstName, lastName } = req.body;
-  
-  // Basic validation
-  if (!email || !firstName || !lastName) {
-    return res.status(400).json({
+router.post('/', async (req: Request<{}, ApiResponse<User>, CreateUserRequest>, res: Response<ApiResponse<User>>) => {
+  try {
+    const { email, firstName, lastName } = req.body;
+    
+    // Basic validation
+    if (!email || !firstName || !lastName) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email, firstName, and lastName are required'
+      });
+    }
+    
+    // Check if email already exists
+    const existingUser = await UserModel.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        error: 'User with this email already exists'
+      });
+    }
+    
+    // Create new user
+    const newUser = new UserModel({
+      email,
+      firstName,
+      lastName
+    });
+    
+    const savedUser = await newUser.save();
+    
+    return res.status(201).json({
+      success: true,
+      data: savedUser.toJSON() as User
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    
+    // Handle validation errors
+    if (error instanceof mongoose.Error.ValidationError) {
+      const errorMessages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        error: errorMessages.join(', ')
+      });
+    }
+    
+    // Handle duplicate key error
+    if ((error as any).code === 11000) {
+      return res.status(409).json({
+        success: false,
+        error: 'User with this email already exists'
+      });
+    }
+    
+    return res.status(500).json({
       success: false,
-      error: 'Email, firstName, and lastName are required'
+      error: 'Failed to create user'
     });
   }
-  
-  // Check if email already exists
-  const existingUser = users.find(u => u.email === email);
-  if (existingUser) {
-    return res.status(409).json({
-      success: false,
-      error: 'User with this email already exists'
-    });
-  }
-  
-  const newUser: User = {
-    id: nextId++,
-    email,
-    firstName,
-    lastName,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  };
-  
-  users.push(newUser);
-  
-  return res.status(201).json({
-    success: true,
-    data: newUser
-  });
 });
 
 // PUT /api/users/:id - Update user
-router.put('/:id', (req: Request<{ id: string }, ApiResponse<User>, UpdateUserRequest>, res: Response<ApiResponse<User>>) => {
-  const id = parseInt(req.params.id);
-  const userIndex = users.findIndex(u => u.id === id);
-  
-  if (userIndex === -1) {
-    return res.status(404).json({
+router.put('/:id', async (req: Request<{ id: string }, ApiResponse<User>, UpdateUserRequest>, res: Response<ApiResponse<User>>) => {
+  try {
+    const { id } = req.params;
+    const { email, firstName, lastName } = req.body;
+    
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid user ID format'
+      });
+    }
+    
+    // Basic validation
+    if (!email || !firstName || !lastName) {
+      return res.status(400).json({
+        success: false,
+        error: 'Email, firstName, and lastName are required'
+      });
+    }
+    
+    // Check if email already exists for a different user
+    const existingUser = await UserModel.findOne({ 
+      email: email.toLowerCase(), 
+      _id: { $ne: id } 
+    });
+    
+    if (existingUser) {
+      return res.status(409).json({
+        success: false,
+        error: 'User with this email already exists'
+      });
+    }
+    
+    // Update user
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      id,
+      { email, firstName, lastName },
+      { new: true, runValidators: true }
+    );
+    
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    return res.json({
+      success: true,
+      data: updatedUser.toJSON() as User
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    
+    // Handle validation errors
+    if (error instanceof mongoose.Error.ValidationError) {
+      const errorMessages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        error: errorMessages.join(', ')
+      });
+    }
+    
+    // Handle duplicate key error
+    if ((error as any).code === 11000) {
+      return res.status(409).json({
+        success: false,
+        error: 'User with this email already exists'
+      });
+    }
+    
+    return res.status(500).json({
       success: false,
-      error: 'User not found'
+      error: 'Failed to update user'
     });
   }
-  
-  const { email, firstName, lastName } = req.body;
-  
-  // Basic validation
-  if (!email || !firstName || !lastName) {
-    return res.status(400).json({
-      success: false,
-      error: 'Email, firstName, and lastName are required'
-    });
-  }
-  
-  // Check if email already exists (but not for the current user)
-  const existingUser = users.find(u => u.email === email && u.id !== id);
-  if (existingUser) {
-    return res.status(409).json({
-      success: false,
-      error: 'User with this email already exists'
-    });
-  }
-  
-  users[userIndex] = {
-    ...users[userIndex],
-    email,
-    firstName,
-    lastName,
-    updatedAt: new Date().toISOString()
-  };
-  
-  return res.json({
-    success: true,
-    data: users[userIndex]
-  });
 });
 
 // DELETE /api/users/:id - Delete user
-router.delete('/:id', (req: Request, res: Response<ApiResponse<User>>) => {
-  const id = parseInt(req.params.id);
-  const userIndex = users.findIndex(u => u.id === id);
-  
-  if (userIndex === -1) {
-    return res.status(404).json({
+router.delete('/:id', async (req: Request, res: Response<ApiResponse<User>>) => {
+  try {
+    const { id } = req.params;
+    
+    // Validate MongoDB ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid user ID format'
+      });
+    }
+    
+    const deletedUser = await UserModel.findByIdAndDelete(id);
+    
+    if (!deletedUser) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found'
+      });
+    }
+    
+    return res.json({
+      success: true,
+      message: 'User deleted successfully',
+      data: deletedUser.toJSON() as User
+    });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return res.status(500).json({
       success: false,
-      error: 'User not found'
+      error: 'Failed to delete user'
     });
   }
-  
-  const deletedUser = users.splice(userIndex, 1)[0];
-  
-  return res.json({
-    success: true,
-    message: 'User deleted successfully',
-    data: deletedUser
-  });
 });
 
 export default router;
