@@ -5,6 +5,7 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 ## Features
 
 - ✅ Full CRUD operations for users
+- ✅ Extended user profiles with phone number and address
 - ✅ TypeScript for type safety
 - ✅ Express.js web framework
 - ✅ MongoDB database with Mongoose ODM
@@ -96,9 +97,19 @@ Content-Type: application/json
   "email": "john.doe@example.com",
   "password": "securePassword123",
   "firstName": "John",
-  "lastName": "Doe"
+  "lastName": "Doe",
+  "phoneNumber": "+1234567890",
+  "address": {
+    "street": "123 Main St",
+    "city": "Anytown",
+    "state": "CA",
+    "zipCode": "12345",
+    "country": "USA"
+  }
 }
 ```
+
+*Note: `phoneNumber` and `address` fields are optional. The `address` object can include any combination of `street`, `city`, `state`, `zipCode`, and `country` fields.*
 
 **Response:**
 ```json
@@ -229,9 +240,19 @@ Content-Type: application/json
 {
   "email": "jane.smith@example.com",
   "firstName": "Jane",
-  "lastName": "Smith"
+  "lastName": "Smith",
+  "phoneNumber": "+1987654321",
+  "address": {
+    "street": "456 Oak Ave",
+    "city": "Another City",
+    "state": "NY",
+    "zipCode": "67890",
+    "country": "USA"
+  }
 }
 ```
+
+*Note: `phoneNumber` and `address` fields are optional.*
 
 **Response:**
 ```json
@@ -242,6 +263,14 @@ Content-Type: application/json
     "email": "jane.smith@example.com",
     "firstName": "Jane",
     "lastName": "Smith",
+    "phoneNumber": "+1987654321",
+    "address": {
+      "street": "456 Oak Ave",
+      "city": "Another City",
+      "state": "NY",
+      "zipCode": "67890",
+      "country": "USA"
+    },
     "createdAt": "2024-07-24T03:30:00.000Z",
     "updatedAt": "2024-07-24T03:30:00.000Z"
   }
@@ -259,9 +288,19 @@ Content-Type: application/json
 {
   "email": "jane.doe@example.com",
   "firstName": "Jane",
-  "lastName": "Doe"
+  "lastName": "Doe",
+  "phoneNumber": "+1555666777",
+  "address": {
+    "street": "789 Updated St",
+    "city": "Updated City",
+    "state": "TX",
+    "zipCode": "54321",
+    "country": "USA"
+  }
 }
 ```
+
+*Note: `phoneNumber` and `address` fields are optional.*
 
 **Response:**
 ```json
@@ -272,6 +311,14 @@ Content-Type: application/json
     "email": "jane.doe@example.com",
     "firstName": "Jane",
     "lastName": "Doe",
+    "phoneNumber": "+1555666777",
+    "address": {
+      "street": "789 Updated St",
+      "city": "Updated City",
+      "state": "TX",
+      "zipCode": "54321",
+      "country": "USA"
+    },
     "createdAt": "2024-07-24T03:30:00.000Z",
     "updatedAt": "2024-07-24T03:32:00.000Z"
   }
