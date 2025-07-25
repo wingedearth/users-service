@@ -3,6 +3,7 @@ import UserModel from '../models/User';
 import { generateToken } from '../utils/jwt';
 import { ApiResponse } from '../types/user';
 import { logInfo, logError, logAuthEvent, logRequest, logResponse } from '../utils/logging';
+import logger from '../config/logger';
 
 interface RegisterRequest {
   email: string;
@@ -215,7 +216,7 @@ export class AuthController {
       });
 
     } catch (error) {
-      logError('Login error', error, context);
+      logError('Login error', error as Error, context);
       logAuthEvent('login_failed', undefined, { ...context, reason: 'server_error' });
       res.status(500).json({
         success: false,
