@@ -129,7 +129,5 @@ UserSchema.methods.toAuthJSON = function() {
     lastName: this.lastName
   };
 };
-UserSchema.index({ email: 1 });
-
 // Export the model
 export default mongoose.model<IUser>('User', UserSchema);
