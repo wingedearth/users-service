@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyToken } from '../utils/jwt';
 import UserModel from '../models/User';
+import logger from '../config/logger';
 
 // Extend Request interface to include user
 declare global {
@@ -52,7 +53,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
 
     next();
   } catch (error) {
-    console.error('Authentication error:', error);
+    logger.error('Authentication error:', error);
     res.status(401).json({
       success: false,
       error: 'Invalid or expired token'

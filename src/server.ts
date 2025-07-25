@@ -5,6 +5,9 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 
 import connectDB from './config/database';
+import logger, { httpStream } from './config/logger';
+import { requestIdMiddleware } from './middleware/requestId';
+import { performanceMiddleware } from './middleware/performance';
 import userRoutes from './routes/users';
 import authRoutes from './routes/auth';
 
@@ -16,7 +19,9 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors()); // Enable CORS
-app.use(morgan('combined')); // Logging
+app.use(requestIdMiddleware); // Generate unique request IDs
+app.use(performanceMiddleware); // Track request performance
+app.use(morgan('combined', { stream: httpStream })); // Logging
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
@@ -43,7 +48,7 @@ app.use('*', (req: Request, res: Response) => {
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
+  logger.error('Unhandled error:', err);
   res.status(500).json({
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
@@ -55,11 +60,11 @@ const startServer = async () => {
   try {
     await connectDB();
     app.listen(PORT, () => {
-      console.log(`users-service has manifested a server on port ${PORT}`);
-      console.log(`Health check available at http://localhost:${PORT}/health`);
+      logger.info(`users-service has manifested a server on port ${PORT}`);
+      logger.info(`Health check available at http://localhost:${PORT}/health`);
     });
   } catch (error) {
-    console.error('Failed to start server:', error);
+    logger.error('Failed to start server:', error);
     process.exit(1);
   }
 };

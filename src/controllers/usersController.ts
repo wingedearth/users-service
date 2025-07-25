@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { User, CreateUserRequest, UpdateUserRequest, ApiResponse } from '../types/user';
 import UserModel from '../models/User';
 import mongoose from 'mongoose';
+import logger from '../config/logger';
 
 export class UsersController {
   // GET /api/users - Get all users
@@ -15,7 +16,7 @@ export class UsersController {
         count: users.length
       });
     } catch (error) {
-      console.error('Error fetching users:', error);
+      logger.error('Error fetching users:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch users'
@@ -52,7 +53,7 @@ export class UsersController {
         data: user.toJSON() as User
       });
     } catch (error) {
-      console.error('Error fetching user:', error);
+      logger.error('Error fetching user:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to fetch user'
@@ -104,7 +105,7 @@ export class UsersController {
         data: savedUser.toJSON() as User
       });
     } catch (error) {
-      console.error('Error creating user:', error);
+      logger.error('Error creating user:', error);
       
       // Handle validation errors
       if (error instanceof mongoose.Error.ValidationError) {
@@ -201,7 +202,7 @@ export class UsersController {
         data: updatedUser.toJSON() as User
       });
     } catch (error) {
-      console.error('Error updating user:', error);
+      logger.error('Error updating user:', error);
       
       // Handle validation errors
       if (error instanceof mongoose.Error.ValidationError) {
@@ -259,7 +260,7 @@ export class UsersController {
         data: deletedUser.toJSON() as User
       });
     } catch (error) {
-      console.error('Error deleting user:', error);
+      logger.error('Error deleting user:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to delete user'
