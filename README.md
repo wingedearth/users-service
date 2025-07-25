@@ -352,8 +352,12 @@ src/
 │   └── database.ts        # MongoDB connection configuration
 ├── models/
 │   └── User.ts            # Mongoose User model with auth methods
+├── controllers/
+│   ├── index.ts           # Controller exports
+│   ├── authController.ts  # Authentication controller logic
+│   └── usersController.ts # Users controller logic
 ├── routes/
-│   ├── users.ts           # User API routes (protected)
+│   ├── users.ts           # User API routes (all protected)
 │   └── auth.ts            # Authentication routes
 ├── middleware/
 │   └── auth.ts            # JWT authentication middleware
