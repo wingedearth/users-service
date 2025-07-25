@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.1](https://github.com/wingedearth/users-service/compare/v2.1.0...v2.1.1) (2025-07-25)
+
+
+### Bug Fixes
+
+* this resolves a warning for a duplicate schema index ([566dc6c](https://github.com/wingedearth/users-service/commit/566dc6c4f578f2488f18519fd4907436d97c01f5))
+
+
+### Documentation
+
+* update README to add address and phone number changes ([49bbfca](https://github.com/wingedearth/users-service/commit/49bbfcaa03323b5b0ddc783db5500a5b78c50ee8))
+
 ## [2.1.0](https://github.com/wingedearth/users-service/compare/v2.0.0...v2.1.0) (2025-07-25)
 
 
