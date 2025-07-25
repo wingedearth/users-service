@@ -7,6 +7,14 @@ export interface IUser extends Document {
   firstName: string;
   lastName: string;
   password: string;
+  phoneNumber?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -44,6 +52,47 @@ const UserSchema: Schema = new Schema(
       required: false, // Made optional for admin user creation
       minlength: [6, 'Password must be at least 6 characters long'],
       select: false // Exclude password field by default
+    },
+    phoneNumber: {
+      type: String,
+      required: false,
+      trim: true,
+      match: [
+        /^[\+]?[1-9][\d]{0,15}$/,
+        'Please enter a valid phone number'
+      ]
+    },
+    address: {
+      street: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [100, 'Street address cannot be more than 100 characters']
+      },
+      city: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [50, 'City cannot be more than 50 characters']
+      },
+      state: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [50, 'State cannot be more than 50 characters']
+      },
+      zipCode: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [20, 'Zip code cannot be more than 20 characters']
+      },
+      country: {
+        type: String,
+        required: false,
+        trim: true,
+        maxlength: [50, 'Country cannot be more than 50 characters']
+      }
     }
   },
   {

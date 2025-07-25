@@ -63,7 +63,7 @@ export class UsersController {
   // POST /api/users - Create new user
   static async createUser(req: Request<{}, ApiResponse<User>, CreateUserRequest>, res: Response<ApiResponse<User>>): Promise<void> {
     try {
-      const { email, firstName, lastName } = req.body;
+      const { email, firstName, lastName, phoneNumber, address } = req.body;
       
       // Basic validation
       if (!email || !firstName || !lastName) {
@@ -85,11 +85,17 @@ export class UsersController {
       }
       
       // Create new user
-      const newUser = new UserModel({
+      const userData: any = {
         email,
         firstName,
         lastName
-      });
+      };
+      
+      // Add optional fields if provided
+      if (phoneNumber) userData.phoneNumber = phoneNumber;
+      if (address) userData.address = address;
+      
+      const newUser = new UserModel(userData);
       
       const savedUser = await newUser.save();
       
@@ -130,7 +136,7 @@ export class UsersController {
   static async updateUser(req: Request<{ id: string }, ApiResponse<User>, UpdateUserRequest>, res: Response<ApiResponse<User>>): Promise<void> {
     try {
       const { id } = req.params;
-      const { email, firstName, lastName } = req.body;
+      const { email, firstName, lastName, phoneNumber, address } = req.body;
       
       // Validate MongoDB ObjectId
       if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -164,10 +170,21 @@ export class UsersController {
         return;
       }
       
+      // Prepare update data
+      const updateData: any = {
+        email,
+        firstName,
+        lastName
+      };
+      
+      // Add optional fields if provided
+      if (phoneNumber !== undefined) updateData.phoneNumber = phoneNumber;
+      if (address !== undefined) updateData.address = address;
+      
       // Update user
       const updatedUser = await UserModel.findByIdAndUpdate(
         id,
-        { email, firstName, lastName },
+        updateData,
         { new: true, runValidators: true }
       );
       

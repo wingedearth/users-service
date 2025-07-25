@@ -8,6 +8,14 @@ interface RegisterRequest {
   firstName: string;
   lastName: string;
   password: string;
+  phoneNumber?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
 }
 
 interface LoginRequest {
@@ -29,7 +37,7 @@ export class AuthController {
   // POST /api/auth/register - Register new user
   static async register(req: Request<{}, ApiResponse<AuthResponse>, RegisterRequest>, res: Response<ApiResponse<AuthResponse>>): Promise<void> {
     try {
-      const { email, firstName, lastName, password } = req.body;
+      const { email, firstName, lastName, password, phoneNumber, address } = req.body;
 
       // Basic validation
       if (!email || !firstName || !lastName || !password) {
@@ -59,13 +67,20 @@ export class AuthController {
         return;
       }
 
-      // Create new user
-      const newUser = new UserModel({
+      // Prepare user data
+      const userData: any = {
         email,
         firstName,
         lastName,
         password
-      });
+      };
+      
+      // Add optional fields if provided
+      if (phoneNumber) userData.phoneNumber = phoneNumber;
+      if (address) userData.address = address;
+
+      // Create new user
+      const newUser = new UserModel(userData);
 
       const savedUser = await newUser.save();
 
