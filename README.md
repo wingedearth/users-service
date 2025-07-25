@@ -17,6 +17,10 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 - ✅ CORS enabled
 - ✅ Security headers with Helmet
 - ✅ Request logging with Morgan
+- ✅ Comprehensive structured logging with Winston
+- ✅ Request correlation with unique request IDs
+- ✅ Performance monitoring and request duration tracking
+- ✅ File-based logging with rotation support
 - ✅ Docker Compose for development
 - ✅ MongoDB Express admin interface
 
@@ -58,6 +62,9 @@ PORT=3000
 MONGODB_URI=mongodb://app-user:app-password@localhost:27017/users-service
 DB_NAME=users-service
 JWT_SECRET=your-super-secret-jwt-key-here
+JWT_EXPIRES_IN=1d
+LOG_LEVEL=info
+LOG_DIR=logs
 ```
 
 ## API Documentation
@@ -396,7 +403,8 @@ Common HTTP status codes:
 src/
 ├── server.ts              # Main server file
 ├── config/
-│   └── database.ts        # MongoDB connection configuration
+│   ├── database.ts        # MongoDB connection configuration
+│   └── logger.ts          # Winston logger configuration
 ├── models/
 │   └── User.ts            # Mongoose User model with auth methods
 ├── controllers/
@@ -407,21 +415,49 @@ src/
 │   ├── users.ts           # User API routes (all protected)
 │   └── auth.ts            # Authentication routes
 ├── middleware/
-│   └── auth.ts            # JWT authentication middleware
+│   ├── auth.ts            # JWT authentication middleware
+│   ├── requestId.ts       # Request ID generation middleware
+│   └── performance.ts     # Performance monitoring middleware
 ├── utils/
-│   └── jwt.ts             # JWT token utilities
+│   ├── jwt.ts             # JWT token utilities
+│   └── logging.ts         # Structured logging utility functions
 └── types/
     └── user.ts            # TypeScript type definitions
 ```
+
+## Logging
+
+The service includes comprehensive structured logging with Winston:
+
+### Log Files
+- `logs/combined.log` - All log messages in JSON format
+- `logs/error.log` - Error-level messages only
+- `logs/exceptions.log` - Uncaught exceptions
+- `logs/rejections.log` - Unhandled promise rejections
+- `logs/debug.log` - Debug messages (development only)
+
+### Log Features
+- **Structured JSON logging** for easy parsing and aggregation
+- **Request correlation** with unique request IDs
+- **Performance monitoring** with request duration tracking
+- **Authentication event logging** with detailed context
+- **Database operation logging** with connection status
+- **Error tracking** with stack traces and request context
+- **Multiple transports** (console, file, error-specific files)
+
+### Environment Configuration
+- `LOG_LEVEL` - Set logging level (error, warn, info, debug)
+- `LOG_DIR` - Directory for log files (default: logs)
+- `NODE_ENV` - Environment affects console logging behavior
 
 ## Next Steps
 
 1. **Enhanced Validation** - Add request validation with libraries like Joi or Zod
 2. **Testing** - Add unit and integration tests
-3. **Logging** - Enhanced logging with Winston or similar
-4. **Rate Limiting** - Add API rate limiting
-5. **Pagination** - Add pagination for user lists
-6. **Search & Filtering** - Add user search and filtering capabilities
+3. **Rate Limiting** - Add API rate limiting
+4. **Pagination** - Add pagination for user lists
+5. **Search & Filtering** - Add user search and filtering capabilities
+6. **Log Aggregation** - Set up ELK Stack or similar for log analysis
 7. **Docker** - Add Docker support for the application itself
 8. **CI/CD** - Set up GitHub Actions for automated testing and deployment
 
