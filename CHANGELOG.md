@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/wingedearth/users-service/compare/v1.2.1...v2.0.0) (2025-07-25)
+
+
+### ⚠ BREAKING CHANGES
+
+* **controllers and user auth:** auth required for user GET routes
+
+### Features
+
+* **controllers and user auth:** added controllers and require auth for user GET routes ([9efdd74](https://github.com/wingedearth/users-service/commit/9efdd747c3954a51f6bd6d97de4f33eaaa7a561a))
+
 ### [1.2.1](https://github.com/wingedearth/users-service/compare/v1.2.0...v1.2.1) (2025-07-24)
 
 
