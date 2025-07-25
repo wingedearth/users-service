@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0](https://github.com/wingedearth/users-service/compare/v2.0.0...v2.1.0) (2025-07-25)
+
+
+### Features
+
+* this adds address and phone number fields to the user model and api ([22b63c0](https://github.com/wingedearth/users-service/commit/22b63c0c5a0bc9da5e6e0b10dc0a95b00bde81a6))
+
 ## [2.0.0](https://github.com/wingedearth/users-service/compare/v1.2.1...v2.0.0) (2025-07-25)
 
 
