@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/wingedearth/users-service/compare/v2.1.1...v2.2.0) (2025-07-26)
+
+
+### Features
+
+* add comprehensive structured logging system ([e2de2eb](https://github.com/wingedearth/users-service/commit/e2de2eb7002b40eb9d3385541176f106c1c9d35d))
+* set up testing environment with vitest and added tests ([bdf22b2](https://github.com/wingedearth/users-service/commit/bdf22b29d2c3e8180ea4a260c371ea5a8a08005f))
+
+
+### Bug Fixes
+
+* resolve TypeScript errors in logging integration ([6983d68](https://github.com/wingedearth/users-service/commit/6983d682199891223724f28b6c91e3091e412fc6))
+
+
+### Documentation
+
+* update README with comprehensive logging documentation ([82ceb4c](https://github.com/wingedearth/users-service/commit/82ceb4ce5565a226dedbc849af8e2d241797c9e9))
+
 ### [2.1.1](https://github.com/wingedearth/users-service/compare/v2.1.0...v2.1.1) (2025-07-25)
 
 
