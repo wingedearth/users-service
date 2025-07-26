@@ -97,10 +97,7 @@ export class AuthController {
       const userId = (savedUser._id as any).toString();
 
       // Generate JWT token
-      const token = generateToken({
-        id: userId,
-        email: savedUser.email
-      });
+      const token = generateToken(userId);
 
       logAuthEvent('registration_success', userId, {
         ...context,
@@ -199,10 +196,7 @@ export class AuthController {
       const userId = (user._id as any).toString();
 
       // Generate JWT token
-      const token = generateToken({
-        id: userId,
-        email: user.email
-      });
+      const token = generateToken(userId);
 
       logAuthEvent('login_success', userId, { ...context, userId });
       logResponse(req, res, 'User logged in successfully', { ...context, userId });

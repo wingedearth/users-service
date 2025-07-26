@@ -34,7 +34,7 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
     const decoded = verifyToken(token);
 
     // Find user in database
-    const user = await UserModel.findById(decoded.id);
+    const user = await UserModel.findById(decoded.userId);
     if (!user) {
       res.status(401).json({
         success: false,

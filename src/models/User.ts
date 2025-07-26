@@ -49,7 +49,7 @@ const UserSchema: Schema = new Schema(
     },
     password: {
       type: String,
-      required: false, // Made optional for admin user creation
+      required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters long'],
       select: false // Exclude password field by default
     },
@@ -102,6 +102,7 @@ const UserSchema: Schema = new Schema(
         ret.id = ret._id.toString();
         delete ret._id;
         delete ret.__v;
+        delete ret.password; // Remove password from JSON output
         return ret;
       }
     }
@@ -122,12 +123,23 @@ UserSchema.methods.comparePassword = async function(candidatePassword: string): 
 
 // Create JSON response with auth token
 UserSchema.methods.toAuthJSON = function() {
-  return {
+  const json: any = {
     id: this._id,
     email: this.email,
     firstName: this.firstName,
     lastName: this.lastName
   };
+  
+  // Include optional fields if they exist
+  if (this.phoneNumber) {
+    json.phoneNumber = this.phoneNumber;
+  }
+  
+  if (this.address) {
+    json.address = this.address;
+  }
+  
+  return json;
 };
 // Export the model
 export default mongoose.model<IUser>('User', UserSchema);

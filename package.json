@@ -12,7 +12,11 @@
     "db:down": "docker-compose down",
     "db:logs": "docker-compose logs -f mongodb",
     "db:admin": "docker-compose up -d mongo-express",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
     "test:api": "./test-api.sh",
     "test:auth": "./test-auth.sh",
     "release": "standard-version",
@@ -59,14 +63,19 @@
     "@types/mongodb": "^4.0.6",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.1.0",
+    "@types/supertest": "^6.0.3",
+    "@vitest/ui": "^3.2.4",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
+    "mongodb-memory-server": "^10.1.4",
     "nodemon": "^3.1.10",
     "standard-version": "^9.5.0",
+    "supertest": "^7.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   },
   "config": {
     "commitizen": {

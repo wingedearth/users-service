@@ -23,6 +23,9 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 - ✅ File-based logging with rotation support
 - ✅ Docker Compose for development
 - ✅ MongoDB Express admin interface
+- ✅ Comprehensive test suite with Vitest
+- ✅ Unit tests for models, controllers, and utilities
+- ✅ Integration tests for API endpoints
 
 ## Quick Start
 
@@ -129,6 +132,14 @@ Content-Type: application/json
       "email": "john.doe@example.com",
       "firstName": "John",
       "lastName": "Doe",
+      "phoneNumber": "+1234567890",
+      "address": {
+        "street": "123 Main St",
+        "city": "Anytown",
+        "state": "CA",
+        "zipCode": "12345",
+        "country": "USA"
+      },
       "createdAt": "2024-07-24T03:30:00.000Z",
       "updatedAt": "2024-07-24T03:30:00.000Z"
     }
@@ -161,6 +172,14 @@ Content-Type: application/json
       "email": "john.doe@example.com",
       "firstName": "John",
       "lastName": "Doe",
+      "phoneNumber": "+1234567890",
+      "address": {
+        "street": "123 Main St",
+        "city": "Anytown",
+        "state": "CA",
+        "zipCode": "12345",
+        "country": "USA"
+      },
       "createdAt": "2024-07-24T03:30:00.000Z",
       "updatedAt": "2024-07-24T03:30:00.000Z"
     }
@@ -183,6 +202,14 @@ Authorization: Bearer <token>
     "email": "john.doe@example.com",
     "firstName": "John",
     "lastName": "Doe",
+    "phoneNumber": "+1234567890",
+    "address": {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "state": "CA",
+      "zipCode": "12345",
+      "country": "USA"
+    },
     "createdAt": "2024-07-24T03:30:00.000Z",
     "updatedAt": "2024-07-24T03:30:00.000Z"
   }
@@ -246,6 +273,7 @@ Content-Type: application/json
 ```json
 {
   "email": "jane.smith@example.com",
+  "password": "securePassword123",
   "firstName": "Jane",
   "lastName": "Smith",
   "phoneNumber": "+1987654321",
@@ -259,7 +287,7 @@ Content-Type: application/json
 }
 ```
 
-*Note: `phoneNumber` and `address` fields are optional.*
+*Note: `password` is required. `phoneNumber` and `address` fields are optional.*
 
 **Response:**
 ```json
@@ -388,7 +416,9 @@ Common HTTP status codes:
 - `npm run db:admin` - Start MongoDB Express web interface (http://localhost:8081)
 
 **Testing:**
-- `npm test` - Run tests (not implemented yet)
+- `npm test` - Run comprehensive test suite with Vitest
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:coverage` - Run tests with coverage report
 - `npm run test:api` - Run API endpoint tests with curl
 - `npm run test:auth` - Run authentication endpoint tests
 
@@ -406,11 +436,14 @@ src/
 │   ├── database.ts        # MongoDB connection configuration
 │   └── logger.ts          # Winston logger configuration
 ├── models/
-│   └── User.ts            # Mongoose User model with auth methods
+│   ├── User.ts            # Mongoose User model with auth methods
+│   └── User.test.ts       # Unit tests for User model
 ├── controllers/
 │   ├── index.ts           # Controller exports
 │   ├── authController.ts  # Authentication controller logic
-│   └── usersController.ts # Users controller logic
+│   ├── authController.test.ts # Tests for auth controller
+│   ├── usersController.ts # Users controller logic
+│   └── usersController.test.ts # Tests for users controller
 ├── routes/
 │   ├── users.ts           # User API routes (all protected)
 │   └── auth.ts            # Authentication routes
@@ -420,7 +453,12 @@ src/
 │   └── performance.ts     # Performance monitoring middleware
 ├── utils/
 │   ├── jwt.ts             # JWT token utilities
+│   ├── jwt.test.ts        # Tests for JWT utilities
 │   └── logging.ts         # Structured logging utility functions
+├── test/
+│   ├── setup.ts           # Test environment configuration
+│   ├── helpers.ts         # Test helper functions
+│   └── health.test.ts     # Health endpoint tests
 └── types/
     └── user.ts            # TypeScript type definitions
 ```
@@ -450,11 +488,36 @@ The service includes comprehensive structured logging with Winston:
 - `LOG_DIR` - Directory for log files (default: logs)
 - `NODE_ENV` - Environment affects console logging behavior
 
+## Testing
+
+The service includes a comprehensive test suite built with Vitest:
+
+### Test Coverage
+- **Unit Tests** - Model methods, JWT utilities, validation logic
+- **Integration Tests** - API endpoints with authentication
+- **Controller Tests** - Request/response handling and error cases
+- **Authentication Tests** - Registration, login, token validation
+- **Database Tests** - Model validation and data persistence
+
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode during development
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+### Test Environment
+Tests use an in-memory MongoDB instance for isolation and speed. Each test suite runs in a clean environment with automatic database cleanup.
+
 ## Next Steps
 
 1. **Enhanced Validation** - Add request validation with libraries like Joi or Zod
-2. **Testing** - Add unit and integration tests
-3. **Rate Limiting** - Add API rate limiting
+2. **Rate Limiting** - Add API rate limiting
 4. **Pagination** - Add pagination for user lists
 5. **Search & Filtering** - Add user search and filtering capabilities
 6. **Log Aggregation** - Set up ELK Stack or similar for log analysis

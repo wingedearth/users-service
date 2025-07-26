@@ -64,13 +64,13 @@ export class UsersController {
   // POST /api/users - Create new user
   static async createUser(req: Request<{}, ApiResponse<User>, CreateUserRequest>, res: Response<ApiResponse<User>>): Promise<void> {
     try {
-      const { email, firstName, lastName, phoneNumber, address } = req.body;
+      const { email, firstName, lastName, password, phoneNumber, address } = req.body;
       
       // Basic validation
-      if (!email || !firstName || !lastName) {
+      if (!email || !firstName || !lastName || !password) {
         res.status(400).json({
           success: false,
-          error: 'Email, firstName, and lastName are required'
+          error: 'Email, firstName, lastName, and password are required'
         });
         return;
       }
@@ -89,7 +89,8 @@ export class UsersController {
       const userData: any = {
         email,
         firstName,
-        lastName
+        lastName,
+        password
       };
       
       // Add optional fields if provided
