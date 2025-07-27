@@ -77,7 +77,7 @@ export const createTestUser = async (overrides: any = {}) => {
 
 export const createTestUserWithToken = async (overrides: any = {}) => {
   const user = await createTestUser(overrides);
-  const token = generateToken(user._id.toString());
+  const token = generateToken((user._id as any).toString());
   
   return { user, token };
 };

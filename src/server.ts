@@ -8,6 +8,7 @@ import connectDB from './config/database';
 import logger, { httpStream } from './config/logger';
 import { requestIdMiddleware } from './middleware/requestId';
 import { performanceMiddleware } from './middleware/performance';
+import { generalLimiter } from './middleware/rateLimiter';
 import userRoutes from './routes/users';
 import authRoutes from './routes/auth';
 
@@ -24,6 +25,7 @@ app.use(performanceMiddleware); // Track request performance
 app.use(morgan('combined', { stream: httpStream })); // Logging
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(generalLimiter); // General rate limiting
 
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {

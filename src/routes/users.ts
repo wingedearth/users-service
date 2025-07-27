@@ -1,8 +1,12 @@
 import express from 'express';
 import { UsersController } from '../controllers';
 import { requireAuth } from '../middleware/auth';
+import { apiLimiter, createUserLimiter } from '../middleware/rateLimiter';
 
 const router = express.Router();
+
+// Apply API rate limiting to all user routes
+router.use(apiLimiter);
 
 // GET /api/users - Get all users (protected)
 router.get('/', requireAuth, UsersController.getAllUsers);
@@ -11,7 +15,7 @@ router.get('/', requireAuth, UsersController.getAllUsers);
 router.get('/:id', requireAuth, UsersController.getUserById);
 
 // POST /api/users - Create new user (protected)
-router.post('/', requireAuth, UsersController.createUser);
+router.post('/', createUserLimiter, requireAuth, UsersController.createUser);
 
 // PUT /api/users/:id - Update user (protected)
 router.put('/:id', requireAuth, UsersController.updateUser);

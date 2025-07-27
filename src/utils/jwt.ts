@@ -15,7 +15,10 @@ export const generateToken = (userId: string): string => {
   }
 
   const payload = { userId };
-  return jwt.sign(payload, secret, { expiresIn });
+  const options: any = { 
+    expiresIn: expiresIn 
+  };
+  return jwt.sign(payload, secret, options);
 };
 
 export const verifyToken = (token: string): JWTPayload => {

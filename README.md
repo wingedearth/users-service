@@ -26,6 +26,7 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 - ✅ Comprehensive test suite with Vitest
 - ✅ Unit tests for models, controllers, and utilities
 - ✅ Integration tests for API endpoints
+- ✅ Rate limiting for API endpoints and authentication
 
 ## Quick Start
 
@@ -397,7 +398,21 @@ Common HTTP status codes:
 - `401` - Unauthorized (invalid or missing token)
 - `404` - Not Found (user doesn't exist)
 - `409` - Conflict (email already exists)
+- `429` - Too Many Requests (rate limit exceeded)
 - `500` - Internal Server Error
+
+#### Rate Limiting Responses
+
+When rate limits are exceeded, the API returns a `429` status with additional information:
+
+```json
+{
+  "error": "Too many authentication attempts from this IP, please try again after 15 minutes.",
+  "retryAfter": 900000
+}
+```
+
+The `retryAfter` field indicates the time in milliseconds until the limit resets.
 
 ## Development
 
@@ -514,15 +529,55 @@ npm run test:coverage
 ### Test Environment
 Tests use an in-memory MongoDB instance for isolation and speed. Each test suite runs in a clean environment with automatic database cleanup.
 
+## Rate Limiting
+
+The service implements comprehensive rate limiting to prevent abuse and ensure service availability:
+
+### Rate Limit Configuration
+
+| Endpoint Category | Limit | Window | Description |
+|------------------|-------|--------|--------------|
+| Authentication | 5 requests | 15 minutes | Registration, login attempts |
+| User Creation | 3 requests | 1 hour | Creating new users via `/api/users` |
+| API Users | 100 requests | 15 minutes | All `/api/users/*` endpoints |
+| General | 1000 requests | 15 minutes | Global rate limit for all requests |
+
+### Rate Limiting Behavior
+
+- **Per-IP Tracking**: Rate limits are applied per client IP address
+- **Request Counting**: All requests count toward limits, including failed ones
+- **Sliding Window**: Limits reset after the specified time window
+- **Automatic Headers**: Response includes rate limit headers when available
+- **Logging**: Rate limit violations are logged with client IP and endpoint
+
+### Rate Limit Headers
+
+When rate limits are enforced, responses may include:
+
+- `X-RateLimit-Limit`: The rate limit ceiling for the endpoint
+- `X-RateLimit-Remaining`: Number of requests remaining in the window  
+- `X-RateLimit-Reset`: Time when the rate limit window resets
+- `Retry-After`: Seconds until the client can retry (on 429 responses)
+
+### Testing Rate Limits
+
+Use the included test script to verify rate limiting:
+
+```bash
+# Test authentication rate limiting (5 requests per 15 minutes)
+./test_auth_rate_limit.sh
+```
+
+The script makes 6 rapid registration requests. The first 5 should succeed (or fail with validation), and the 6th should return a 429 status code.
+
 ## Next Steps
 
 1. **Enhanced Validation** - Add request validation with libraries like Joi or Zod
-2. **Rate Limiting** - Add API rate limiting
-4. **Pagination** - Add pagination for user lists
-5. **Search & Filtering** - Add user search and filtering capabilities
-6. **Log Aggregation** - Set up ELK Stack or similar for log analysis
-7. **Docker** - Add Docker support for the application itself
-8. **CI/CD** - Set up GitHub Actions for automated testing and deployment
+2. **Pagination** - Add pagination for user lists
+3. **Search & Filtering** - Add user search and filtering capabilities
+4. **Log Aggregation** - Set up ELK Stack or similar for log analysis
+5. **Docker** - Add Docker support for the application itself
+6. **CI/CD** - Set up GitHub Actions for automated testing and deployment
 
 ## Contributing
 
