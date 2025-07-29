@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/wingedearth/users-service/compare/v2.2.0...v2.3.0) (2025-07-29)
+
+
+### Features
+
+* add rate limiting ([dcc1c16](https://github.com/wingedearth/users-service/commit/dcc1c1669ca3d78f0c7dfdee2e5865a12ae9aed7))
+* integrate with MongoDB Atlas ([e4e8dd9](https://github.com/wingedearth/users-service/commit/e4e8dd98194c49a45ad7f958c15ff813db3f93d8))
+
 ## [2.2.0](https://github.com/wingedearth/users-service/compare/v2.1.1...v2.2.0) (2025-07-26)
 
 
