@@ -1,6 +1,6 @@
 {
   "name": "users-service",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "A users service exposing a REST API",
   "main": "dist/server.js",
   "scripts": {
