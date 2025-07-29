@@ -1,12 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+// Enum for user roles
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin'
+}
+
 // Interface for the User document
 export interface IUser extends Document {
   email: string;
   firstName: string;
   lastName: string;
   password: string;
+  role: UserRole;
   phoneNumber?: string;
   address?: {
     street?: string;
@@ -19,6 +26,7 @@ export interface IUser extends Document {
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
   toAuthJSON(): object;
+  isAdmin(): boolean;
 }
 
 // User schema definition
@@ -52,6 +60,12 @@ const UserSchema: Schema = new Schema(
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters long'],
       select: false // Exclude password field by default
+    },
+    role: {
+      type: String,
+      enum: Object.values(UserRole),
+      default: UserRole.USER,
+      required: [true, 'User role is required']
     },
     phoneNumber: {
       type: String,
@@ -121,13 +135,19 @@ UserSchema.methods.comparePassword = async function(candidatePassword: string): 
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+// Check if user is admin
+UserSchema.methods.isAdmin = function(): boolean {
+  return this.role === UserRole.ADMIN;
+};
+
 // Create JSON response with auth token
 UserSchema.methods.toAuthJSON = function() {
   const json: any = {
     id: this._id,
     email: this.email,
     firstName: this.firstName,
-    lastName: this.lastName
+    lastName: this.lastName,
+    role: this.role
   };
   
   // Include optional fields if they exist

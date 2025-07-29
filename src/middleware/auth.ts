@@ -3,6 +3,8 @@ import { verifyToken } from '../utils/jwt';
 import UserModel from '../models/User';
 import logger from '../config/logger';
 
+import { UserRole } from '../models/User';
+
 // Extend Request interface to include user
 declare global {
   namespace Express {
@@ -12,6 +14,7 @@ declare global {
         email: string;
         firstName: string;
         lastName: string;
+        role: UserRole;
       };
     }
   }
@@ -48,7 +51,8 @@ export const authenticateToken = async (req: Request, res: Response, next: NextF
       id: (user._id as any).toString(),
       email: user.email,
       firstName: user.firstName,
-      lastName: user.lastName
+      lastName: user.lastName,
+      role: user.role
     };
 
     next();

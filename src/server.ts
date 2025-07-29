@@ -11,6 +11,7 @@ import { performanceMiddleware } from './middleware/performance';
 import { generalLimiter } from './middleware/rateLimiter';
 import userRoutes from './routes/users';
 import authRoutes from './routes/auth';
+import adminRoutes from './routes/admin';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.get('/health', (req: Request, res: Response) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {

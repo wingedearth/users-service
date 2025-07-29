@@ -1,3 +1,8 @@
+export enum UserRole {
+  USER = 'user',
+  ADMIN = 'admin'
+}
+
 export interface Address {
   street?: string;
   city?: string;
@@ -11,6 +16,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  role: UserRole;
   phoneNumber?: string;
   address?: Address;
   createdAt: Date | string;

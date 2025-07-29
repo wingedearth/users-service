@@ -10,6 +10,7 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 - ✅ Express.js web framework
 - ✅ MongoDB Atlas cloud database with Mongoose ODM
 - ✅ JWT-based authentication and authorization
+- ✅ Role-based access control (User/Admin roles)
 - ✅ Secure password hashing with bcrypt
 - ✅ Input validation and data modeling
 - ✅ Comprehensive error handling
@@ -191,6 +192,7 @@ Content-Type: application/json
       "email": "john.doe@example.com",
       "firstName": "John",
       "lastName": "Doe",
+      "role": "user",
       "phoneNumber": "+1234567890",
       "address": {
         "street": "123 Main St",
@@ -231,6 +233,7 @@ Content-Type: application/json
       "email": "john.doe@example.com",
       "firstName": "John",
       "lastName": "Doe",
+      "role": "user",
       "phoneNumber": "+1234567890",
       "address": {
         "street": "123 Main St",
@@ -261,6 +264,7 @@ Authorization: Bearer <token>
     "email": "john.doe@example.com",
     "firstName": "John",
     "lastName": "Doe",
+    "role": "user",
     "phoneNumber": "+1234567890",
     "address": {
       "street": "123 Main St",
@@ -440,6 +444,149 @@ DELETE /api/users/:id
 }
 ```
 
+### Admin API
+
+*Note: All admin endpoints require authentication with admin role. Include the JWT token in the Authorization header: `Authorization: Bearer <token>`*
+
+#### Promote User to Admin
+```
+PATCH /api/admin/:id/promote
+Authorization: Bearer <admin-token>
+```
+
+Promotes a regular user to administrator role.
+
+**Parameters:**
+- `id` - User ID to promote
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "User promoted to administrator successfully",
+  "data": {
+    "id": "507f1f77bcf86cd799439011",
+    "email": "user@example.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "role": "admin",
+    "createdAt": "2024-07-24T03:30:00.000Z",
+    "updatedAt": "2024-07-24T03:35:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+- `400` - User is already an administrator
+- `404` - User not found
+- `403` - Permission denied (not admin)
+
+#### Demote Admin to User
+```
+PATCH /api/admin/:id/demote
+Authorization: Bearer <admin-token>
+```
+
+Demotes an administrator to regular user role.
+
+**Parameters:**
+- `id` - Admin user ID to demote
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Administrator demoted to user successfully",
+  "data": {
+    "id": "507f1f77bcf86cd799439011",
+    "email": "admin@example.com",
+    "firstName": "Jane",
+    "lastName": "Admin",
+    "role": "user",
+    "createdAt": "2024-07-24T03:30:00.000Z",
+    "updatedAt": "2024-07-24T03:40:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+- `400` - User is already a regular user or cannot demote yourself
+- `404` - User not found
+- `403` - Permission denied (not admin)
+
+#### Get Admin Statistics
+```
+GET /api/admin/stats
+Authorization: Bearer <admin-token>
+```
+
+Returns comprehensive statistics about the user base.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "stats": {
+      "totalUsers": 150,
+      "totalAdmins": 3,
+      "regularUsers": 147
+    },
+    "recentUsers": [
+      {
+        "id": "507f1f77bcf86cd799439015",
+        "email": "newest@example.com",
+        "firstName": "New",
+        "lastName": "User",
+        "role": "user",
+        "createdAt": "2024-07-24T10:30:00.000Z",
+        "updatedAt": "2024-07-24T10:30:00.000Z"
+      }
+    ]
+  }
+}
+```
+
+**Error Responses:**
+- `403` - Permission denied (not admin)
+
+### Role-Based Access Control
+
+The service implements a two-tier role system:
+
+#### User Roles
+
+**Regular User (`user`):**
+- Default role for new registrations
+- Can access own profile and standard user endpoints
+- Cannot access admin endpoints
+- Cannot modify other users' data
+
+**Administrator (`admin`):**
+- Full access to all endpoints
+- Can promote users to admin
+- Can demote other admins (except themselves)
+- Can view system statistics
+- Has audit logging for all admin actions
+
+#### Admin Features
+
+**Role Management:**
+- Promote users to administrators
+- Demote administrators to regular users
+- Self-demotion protection (admins cannot demote themselves)
+
+**System Monitoring:**
+- View total user counts by role
+- Access recent user registrations
+- Comprehensive admin audit logging
+
+**Security Features:**
+- All admin actions are logged with admin identity
+- Role-based middleware protection
+- JWT tokens include role information
+- 403 Forbidden responses for unauthorized access attempts
+
 ### Error Responses
 
 All endpoints return errors in the following format:
@@ -518,14 +665,18 @@ src/
 │   ├── authController.ts  # Authentication controller logic
 │   ├── authController.test.ts # Tests for auth controller
 │   ├── usersController.ts # Users controller logic
-│   └── usersController.test.ts # Tests for users controller
+│   ├── usersController.test.ts # Tests for users controller
+│   └── adminController.ts # Admin role management controller
 ├── routes/
 │   ├── users.ts           # User API routes (all protected)
-│   └── auth.ts            # Authentication routes
+│   ├── auth.ts            # Authentication routes
+│   └── admin.ts           # Admin-only routes for role management
 ├── middleware/
 │   ├── auth.ts            # JWT authentication middleware
+│   ├── requireAdmin.ts    # Admin role authorization middleware
 │   ├── requestId.ts       # Request ID generation middleware
-│   └── performance.ts     # Performance monitoring middleware
+│   ├── performance.ts     # Performance monitoring middleware
+│   └── rateLimiter.ts     # Rate limiting middleware configurations
 ├── utils/
 │   ├── jwt.ts             # JWT token utilities
 │   ├── jwt.test.ts        # Tests for JWT utilities
