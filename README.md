@@ -8,7 +8,7 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 - ✅ Extended user profiles with phone number and address
 - ✅ TypeScript for type safety
 - ✅ Express.js web framework
-- ✅ MongoDB database with Mongoose ODM
+- ✅ MongoDB Atlas cloud database with Mongoose ODM
 - ✅ JWT-based authentication and authorization
 - ✅ Secure password hashing with bcrypt
 - ✅ Input validation and data modeling
@@ -33,7 +33,8 @@ A REST API service for managing users, built with Node.js, Express, and TypeScri
 ### Prerequisites
 - Node.js (v16 or higher)
 - npm
-- Docker and Docker Compose
+- MongoDB Atlas account (free tier available)
+- Docker and Docker Compose (optional, for local development)
 
 ### Installation
 
@@ -45,8 +46,8 @@ cd users-service
 # Install dependencies
 npm install
 
-# Start MongoDB database
-npm run db:up
+# Configure your MongoDB Atlas connection (see Environment Variables below)
+# Edit .env file with your Atlas connection string
 
 # Run in development mode
 npm run dev
@@ -63,12 +64,69 @@ Create a `.env` file in the root directory:
 ```
 NODE_ENV=development
 PORT=3000
-MONGODB_URI=mongodb://app-user:app-password@localhost:27017/users-service
+MONGODB_URI=mongodb+srv://username:password@your-cluster.xxxxx.mongodb.net/users-service?retryWrites=true&w=majority
 DB_NAME=users-service
 JWT_SECRET=your-super-secret-jwt-key-here
 JWT_EXPIRES_IN=1d
 LOG_LEVEL=info
 LOG_DIR=logs
+```
+
+#### MongoDB Atlas Configuration
+
+To get your MongoDB Atlas connection string:
+
+1. **Log into MongoDB Atlas** at https://cloud.mongodb.com/
+2. **Navigate to your cluster** and click "Connect"
+3. **Choose "Connect your application"**
+4. **Select Node.js** as the driver
+5. **Copy the connection string** and replace:
+   - `<username>` with your database username
+   - `<password>` with your database password
+   - `<database>` with `users-service` (or your preferred database name)
+
+**Example Atlas connection string:**
+```
+mongodb+srv://myuser:mypassword@users-service.abc123.mongodb.net/users-service?retryWrites=true&w=majority
+```
+
+**For local development** (alternative), you can still use Docker:
+```
+MONGODB_URI=mongodb://app-user:app-password@localhost:27017/users-service
+```
+
+## Database
+
+### MongoDB Atlas (Recommended)
+
+This service is configured to use **MongoDB Atlas**, MongoDB's cloud database service:
+
+**Benefits:**
+- ✅ **Cloud-hosted** - No local setup required
+- ✅ **Automatic backups** - Built-in data protection
+- ✅ **High availability** - 99.995% uptime SLA
+- ✅ **Global clusters** - Deploy close to your users
+- ✅ **Free tier** - Perfect for development and small projects
+- ✅ **Easy scaling** - Upgrade as your service grows
+- ✅ **Built-in security** - Network isolation and encryption
+
+**Atlas Features Used:**
+- Connection pooling with optimized settings
+- Automatic failover and replica sets
+- Network-level security
+- Database user authentication
+- Performance monitoring and alerts
+
+### Local Development Alternative
+
+If you prefer local development, Docker Compose is still available:
+
+```bash
+# Start local MongoDB with Docker
+npm run db:up
+
+# Update your .env file to use local connection:
+MONGODB_URI=mongodb://app-user:app-password@localhost:27017/users-service
 ```
 
 ## API Documentation
@@ -424,11 +482,13 @@ The `retryAfter` field indicates the time in milliseconds until the limit resets
 - `npm run build` - Build TypeScript to JavaScript
 - `npm start` - Run the compiled JavaScript
 
-**Database:**
-- `npm run db:up` - Start MongoDB with Docker Compose
-- `npm run db:down` - Stop and remove MongoDB containers
-- `npm run db:logs` - View MongoDB logs
+**Database (Local Docker - Optional):**
+- `npm run db:up` - Start local MongoDB with Docker Compose
+- `npm run db:down` - Stop and remove local MongoDB containers
+- `npm run db:logs` - View local MongoDB logs
 - `npm run db:admin` - Start MongoDB Express web interface (http://localhost:8081)
+
+*Note: These scripts are only needed if using local Docker instead of MongoDB Atlas*
 
 **Testing:**
 - `npm test` - Run comprehensive test suite with Vitest
