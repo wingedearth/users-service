@@ -8,8 +8,70 @@ const consoleFormat = printf(({ level, message, timestamp, stack }) => {
   return `${timestamp} [${level}]: ${stack || message}`;
 });
 
-// Create logs directory if it doesn't exist
+// Create logs directory if it doesn't exist (only in non-production)
 const logsDir = path.join(process.cwd(), process.env.LOG_DIR || 'logs');
+
+// Configure transports based on environment
+const transports: winston.transport[] = [];
+const exceptionHandlers: winston.transport[] = [];
+const rejectionHandlers: winston.transport[] = [];
+
+// In production (Heroku), only use console logging
+if (process.env.NODE_ENV === 'production') {
+  transports.push(new winston.transports.Console({
+    format: combine(
+      timestamp(),
+      json()
+    )
+  }));
+  
+  exceptionHandlers.push(new winston.transports.Console({
+    format: combine(
+      timestamp(),
+      json()
+    )
+  }));
+  
+  rejectionHandlers.push(new winston.transports.Console({
+    format: combine(
+      timestamp(),
+      json()
+    )
+  }));
+} else {
+  // In development, use file transports
+  transports.push(
+    new winston.transports.File({
+      filename: path.join(logsDir, 'error.log'),
+      level: 'error',
+      maxsize: 10485760, // 10MB
+      maxFiles: 5,
+      tailable: true
+    }),
+    new winston.transports.File({
+      filename: path.join(logsDir, 'combined.log'),
+      maxsize: 10485760, // 10MB
+      maxFiles: 5,
+      tailable: true
+    })
+  );
+  
+  exceptionHandlers.push(
+    new winston.transports.File({
+      filename: path.join(logsDir, 'exceptions.log'),
+      maxsize: 10485760, // 10MB
+      maxFiles: 3
+    })
+  );
+  
+  rejectionHandlers.push(
+    new winston.transports.File({
+      filename: path.join(logsDir, 'rejections.log'),
+      maxsize: 10485760, // 10MB
+      maxFiles: 3
+    })
+  );
+}
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
@@ -19,39 +81,9 @@ const logger = winston.createLogger({
     json()
   ),
   defaultMeta: { service: 'users-service' },
-  transports: [
-    // Write all logs with importance level of `error` or higher to `logs/error.log`
-    new winston.transports.File({
-      filename: path.join(logsDir, 'error.log'),
-      level: 'error',
-      maxsize: 10485760, // 10MB
-      maxFiles: 5,
-      tailable: true
-    }),
-    // Write all logs with importance level of `info` or higher to `logs/combined.log`
-    new winston.transports.File({
-      filename: path.join(logsDir, 'combined.log'),
-      maxsize: 10485760, // 10MB
-      maxFiles: 5,
-      tailable: true
-    })
-  ],
-  // Handle uncaught exceptions
-  exceptionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logsDir, 'exceptions.log'),
-      maxsize: 10485760, // 10MB
-      maxFiles: 3
-    })
-  ],
-  // Handle unhandled promise rejections
-  rejectionHandlers: [
-    new winston.transports.File({
-      filename: path.join(logsDir, 'rejections.log'),
-      maxsize: 10485760, // 10MB
-      maxFiles: 3
-    })
-  ]
+  transports,
+  exceptionHandlers,
+  rejectionHandlers
 });
 
 // Separate logger for debug logs
